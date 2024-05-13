@@ -11,6 +11,7 @@ import com.example.Ecommerce.service.JWT.AuthenticationService;
 import com.example.Ecommerce.service.JWT.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,19 +55,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public JwtAuthenticationResponse login (LoginRequest loginRequest){
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
-                loginRequest.getPassword()));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+            );
+            var user = userRepository.findByUsername(loginRequest.getUsername())
+                    .orElseThrow(() -> new IllegalArgumentException("Username or password is incorrect"));
 
-        var user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
-        var jwt = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshTokenToken(new HashMap<>(), user);
+            var jwt = jwtService.generateToken(user);
+            var refreshToken = jwtService.generateRefreshTokenToken(new HashMap<>(), user);
 
-        JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse();
+            JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse();
+            jwtAuthenticationResponse.setToken(jwt);
+            jwtAuthenticationResponse.setRefreshToken(refreshToken);
 
-        jwtAuthenticationResponse.setToken(jwt);
-        jwtAuthenticationResponse.setRefreshToken(refreshToken);
-
-        return jwtAuthenticationResponse;
+            return jwtAuthenticationResponse;
+        } catch (BadCredentialsException ex) {
+            throw new IllegalArgumentException("Username or password is incorrect");
+        }
     }
 
     @Override

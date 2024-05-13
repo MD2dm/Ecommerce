@@ -8,4 +8,6 @@ public class ProductRequest {
     private String nameProduct;
 
     private String idProduct;
+
+    private String ThaoVan;
 }
