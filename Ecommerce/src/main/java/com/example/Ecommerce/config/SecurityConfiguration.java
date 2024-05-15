@@ -49,7 +49,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/admin").hasAnyAuthority(Role.ADMIN.name())
                         .requestMatchers("/api/v1/sellers/**").hasAnyAuthority(Role.SELLER.name())
                         .requestMatchers("/api/v1/customers/**").hasAnyAuthority(Role.CUSTOMER.name())
+                        .requestMatchers("/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/register-seller").hasAuthority(Role.CUSTOMER.name())
+
                         .anyRequest()
                         .authenticated())
 

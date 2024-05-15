@@ -37,7 +37,7 @@ public class User implements UserDetails {
     @Column(name = "email", length = 50, unique = true ,nullable = false)
     private String email;
 
-    @Column(name = "avatar", length = 255)
+    @Column(name = "avatar", columnDefinition = "varchar(max)")
     private String avatar;
 
     @Column(name = "date")

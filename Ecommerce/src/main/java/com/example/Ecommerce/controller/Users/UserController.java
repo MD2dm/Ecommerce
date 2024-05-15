@@ -3,9 +3,9 @@ package com.example.Ecommerce.controller.Users;
 import com.example.Ecommerce.dto.Users.UserUpdateRequest;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.service.User.UserService;
+import com.example.Ecommerce.ultils.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +20,8 @@ import java.io.IOException;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final FileUploadUtil fileUploadUtil;
 
     @GetMapping
     public ResponseEntity<String> sayHello(){
@@ -35,13 +36,20 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUsers(@PathVariable("id") Long id, @RequestBody UserUpdateRequest userUpdateRequest){
-        User users = userService.updateUser(id, userUpdateRequest);
+    public ResponseEntity<User> updateUsers(@PathVariable("id") Long id,
+                                            @RequestPart("updateUserRequest") UserUpdateRequest userUpdateRequest,
+                                            @RequestPart(value = "avatar", required = false) MultipartFile avatarFile) throws IOException {
 
-        if (users != null){
-            return  ResponseEntity.ok(users);
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            String avatarPath = fileUploadUtil.uploadFile(avatarFile).toString();
+            userUpdateRequest.setAvatar(avatarPath);
+        }
+
+        User updatedUser = userService.updateUser(id, userUpdateRequest);
+        if (updatedUser != null) {
+            return ResponseEntity.ok(updatedUser);
         } else {
-            return  ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build();
         }
     }
 }
