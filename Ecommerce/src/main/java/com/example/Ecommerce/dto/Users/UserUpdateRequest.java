@@ -1,15 +1,14 @@
 package com.example.Ecommerce.dto.Users;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.Max;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
 
-@Data
+@Getter@Setter
 public class UserUpdateRequest implements Serializable  {
 
 

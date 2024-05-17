@@ -1,12 +1,10 @@
 package com.example.Ecommerce.dto.Users;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
 
 import java.io.Serializable;
 
-@Data
-@RequiredArgsConstructor
+@Getter
 public class LoginRequest implements Serializable {
 
     private String username;
