@@ -1,5 +1,6 @@
 package com.example.Ecommerce.controller.Users;
 
+
 import com.example.Ecommerce.dto.Users.UserUpdateRequest;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.service.User.UserService;
@@ -13,8 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -34,6 +33,7 @@ public class UserController {
 
     @Operation(summary = "Get Info User")
     @GetMapping("/info")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<User> getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
@@ -42,6 +42,7 @@ public class UserController {
 
     @Operation(summary = "Update Info User")
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<?> updateUser(
             @PathVariable Long id,
             @RequestBody UserUpdateRequest updateUserRequest,

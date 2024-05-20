@@ -43,6 +43,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException("Email already exists");
         }
 
+        String password = signUpRequest.getPassword();
+        if (password.length() < 8 || !password.matches(".*[A-Z].*")) {
+            throw new RuntimeException("Password must be at least 8 characters long and contain at least one uppercase letter");
+        }
+
         User user = new User();
 
         user.setUsername(signUpRequest.getUsername());

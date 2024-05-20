@@ -35,17 +35,17 @@ public class UserServiceImpl implements UserService {
             User user = optionalUser.get();
             user.setEmail(updateUserRequest.getEmail());
 
-            try {
-                if (avatar != null && !avatar.isEmpty()) {
-                    String avatarUrl = fileService.upload(avatar);
-                    user.setAvatar(avatarUrl);
-                }
-            } catch (IOException e) {
-                // Xử lý lỗi upload file
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            } catch (java.io.IOException e) {
-                throw new RuntimeException(e);
-            }
+//            try {
+//                if (avatar != null && !avatar.isEmpty()) {
+//                    String avatarUrl = fileService.upload(avatar);
+//                    user.setAvatar(avatarUrl);
+//                }
+//            } catch (IOException e) {
+//                // Xử lý lỗi upload file
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//            } catch (java.io.IOException e) {
+//                throw new RuntimeException(e);
+//            }
 
             user.setBirthday(updateUserRequest.getBirthday());
             user.setFirstName(updateUserRequest.getFirstName());
