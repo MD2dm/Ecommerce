@@ -4,13 +4,15 @@ package com.example.Ecommerce.service.User.Impl;
 import com.example.Ecommerce.dto.Users.UserUpdateRequest;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.repository.UserRepository;
+import com.example.Ecommerce.service.File.FileService;
 import com.example.Ecommerce.service.User.UserService;
-import com.example.Ecommerce.ultils.FileUploadUtil;
+import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.Optional;
 
 
@@ -18,22 +20,31 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    @Autowired
     private final UserRepository userRepository;
 
+    @Autowired
+    private final FileService fileService;
+
+
     @Override
-    public User updateUser(Long userId, UserUpdateRequest updateUserRequest) {
+    public ResponseEntity<User> updateUser(Long userId, UserUpdateRequest updateUserRequest, MultipartFile avatar) {
         Optional<User> optionalUser = userRepository.findById(userId);
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-
             user.setEmail(updateUserRequest.getEmail());
 
-            String newAvatarPath = updateUserRequest.getAvatar();
-            if (newAvatarPath != null && !newAvatarPath.isEmpty()) {
-                user.setAvatar(newAvatarPath);
-            } else {
-                user.setAvatar(updateUserRequest.getAvatar());
+            try {
+                if (avatar != null && !avatar.isEmpty()) {
+                    String avatarUrl = fileService.upload(avatar);
+                    user.setAvatar(avatarUrl);
+                }
+            } catch (IOException e) {
+                // Xử lý lỗi upload file
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            } catch (java.io.IOException e) {
+                throw new RuntimeException(e);
             }
 
             user.setBirthday(updateUserRequest.getBirthday());
@@ -42,11 +53,11 @@ public class UserServiceImpl implements UserService {
             user.setAddress(updateUserRequest.getAddress());
             user.setPhone(updateUserRequest.getPhone());
 
+            User savedUser = userRepository.save(user);
 
-            return userRepository.save(user);
-
+            return ResponseEntity.ok(savedUser);
         } else {
-            throw new RuntimeException("User not found with id: " + userId);
+            return ResponseEntity.notFound().build();
         }
     }
 

@@ -38,6 +38,7 @@ public class User implements UserDetails {
     private String email;
 
     @Column(name = "avatar", columnDefinition = "varchar(max)")
+    @Lob
     private String avatar;
 
     @Column(name = "date")
