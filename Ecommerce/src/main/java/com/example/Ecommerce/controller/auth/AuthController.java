@@ -1,31 +1,30 @@
-package com.example.Ecommerce.controller.JWT;
+package com.example.Ecommerce.controller.auth;
+
 
 import com.example.Ecommerce.dto.ResponseStatus.ResponseData;
-import com.example.Ecommerce.dto.ResponseStatus.ResponseError;
-import com.example.Ecommerce.dto.Users.JwtAuthenticationResponse;
-import com.example.Ecommerce.dto.Users.LoginRequest;
-import com.example.Ecommerce.dto.Users.RefreshTokenRequest;
-import com.example.Ecommerce.dto.Users.SignUpRequest;
+import com.example.Ecommerce.dto.UsersDto.JwtAuthResponseDTO;
+import com.example.Ecommerce.dto.UsersDto.LoginRequestDTO;
+import com.example.Ecommerce.dto.UsersDto.RefreshTokenRequestDTO;
+import com.example.Ecommerce.dto.UsersDto.RegisterRequestDTO;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.repository.UserRepository;
-import com.example.Ecommerce.service.JWT.AuthenticationService;
-
+import com.example.Ecommerce.service.Auth.JWT.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication Controller")
-public class AuthenticationController {
+public class AuthController {
+
 
     private final AuthenticationService authenticationService;
 
@@ -33,49 +32,63 @@ public class AuthenticationController {
 
     @Operation(summary = "Register Account User")
     @PostMapping("/register")
-    public ResponseEntity<ResponseData<User>> register(@RequestBody SignUpRequest signUpRequest) {
-
-        //Check username
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+    public ResponseEntity<ResponseData<Void>> register(@RequestBody RegisterRequestDTO request) {
+        // Check username, email, phone, password
+        if (userRepository.existsByUsername(request.getUsername())) {
             return ResponseEntity.badRequest()
                     .body(new ResponseData<>(400, "Username already exists", null));
         }
 
-        //Check email
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity.badRequest()
                     .body(new ResponseData<>(400, "Email already exists", null));
         }
 
-        //Check password
-        String password = signUpRequest.getPassword();
+        if (userRepository.existsByPhone(request.getPhone())) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponseData<>(400, "Phone already exists", null));
+        }
+
+        String password = request.getPassword();
         if (password.length() < 8 || !password.matches(".*[A-Z].*")) {
             return ResponseEntity.badRequest()
                     .body(new ResponseData<>(400, "Password must be at least 8 characters long and contain at least one uppercase letter", null));
         }
 
-        User user = authenticationService.signUp(signUpRequest);
+        authenticationService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ResponseData<>(201, "User registered successfully", user));
+                .body(new ResponseData<>(201, "OTP sent to email. Please verify.", null));
+    }
+
+    @Operation(summary = "Verify OTP and Complete Registration")
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ResponseData<User>> verifyOtp(@RequestParam String email, @RequestParam String otp) {
+        try {
+            User user = authenticationService.verifyOtp(email, otp);
+            return ResponseEntity.ok(new ResponseData<>(201, "User registered successfully", user));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseData<>(401, "Invalid OTP", null));
+        }
     }
 
 
     @Operation(summary = "Login Account User")
     @PostMapping("/login")
-    public ResponseEntity<ResponseData<JwtAuthenticationResponse>> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<ResponseData<JwtAuthResponseDTO>> login(@RequestBody LoginRequestDTO request) {
         try {
-            JwtAuthenticationResponse jwt = authenticationService.login(loginRequest);
+            JwtAuthResponseDTO jwt = authenticationService.login(request);
             return ResponseEntity.ok(new ResponseData<>(201, "Login successful", jwt));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseData<>(401, "Invalid credentials", null));
+                    .body(new ResponseData<>(401, "Invalid credentials"));
         }
     }
 
     @Operation(summary = "Refresher Token User's")
     @PostMapping("/refresh")
-    public ResponseData<JwtAuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest){
-        JwtAuthenticationResponse jwtRefreshToken = authenticationService.refreshToken(refreshTokenRequest);
+    public ResponseData<JwtAuthResponseDTO> refreshToken(@RequestBody RefreshTokenRequestDTO request){
+        JwtAuthResponseDTO jwtRefreshToken = authenticationService.refreshToken(request);
         return new ResponseData<>(202, "RefreshToken successful", jwtRefreshToken);
     }
 

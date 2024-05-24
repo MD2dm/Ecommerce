@@ -1,6 +1,6 @@
-package com.example.Ecommerce.service.JWT.Impl;
+package com.example.Ecommerce.service.Auth.JWT.Impl;
 
-import com.example.Ecommerce.service.JWT.JWTService;
+import com.example.Ecommerce.service.Auth.JWT.JWTService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -8,6 +8,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;

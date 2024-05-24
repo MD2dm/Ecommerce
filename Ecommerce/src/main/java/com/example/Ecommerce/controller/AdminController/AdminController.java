@@ -1,4 +1,5 @@
-package com.example.Ecommerce.controller.JWT;
+package com.example.Ecommerce.controller.AdminController;
+
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,4 +20,5 @@ public class AdminController {
     public ResponseEntity<String> sayHello(){
         return ResponseEntity.ok("Hello Admin");
     }
+
 }

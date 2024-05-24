@@ -1,7 +1,9 @@
 package com.example.Ecommerce.controller.Users;
 
 
-import com.example.Ecommerce.dto.Users.UserUpdateRequest;
+import com.example.Ecommerce.dto.ResponseStatus.ResponseData;
+import com.example.Ecommerce.dto.ResponseStatus.ResponseError;
+import com.example.Ecommerce.dto.UsersDto.UserUpdateRequestDTO;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.service.User.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,11 +35,21 @@ public class UserController {
 
     @Operation(summary = "Get Info User")
     @GetMapping("/info")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<User> getUserInfo() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(user);
+    public ResponseEntity<Object> getUserInfo() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User user = (User) authentication.getPrincipal();
+
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ResponseError(401, "Unauthorized"));
+            }
+
+            return ResponseEntity.ok(new ResponseData<>(201, "User information retrieved successfully", user));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseError(500, "Internal Server Error"));
+        }
     }
 
     @Operation(summary = "Update Info User")
@@ -45,11 +57,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<?> updateUser(
             @PathVariable Long id,
-            @RequestBody UserUpdateRequest updateUserRequest,
+            @RequestBody UserUpdateRequestDTO request,
             @RequestParam(value = "avatar", required = false) MultipartFile avatar
     ) {
         try {
-            ResponseEntity<User> responseEntity = userService.updateUser(id, updateUserRequest, avatar);
+            ResponseEntity<User> responseEntity = userService.updateUser(id, request, avatar);
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 User updatedUser = responseEntity.getBody();
                 return ResponseEntity.ok(updatedUser);

@@ -1,4 +1,4 @@
-package com.example.Ecommerce.model;
+package com.example.Ecommerce.common.enums;
 
 public enum Role {
 
@@ -7,5 +7,4 @@ public enum Role {
     SELLER,
 
     CUSTOMER
-
 }

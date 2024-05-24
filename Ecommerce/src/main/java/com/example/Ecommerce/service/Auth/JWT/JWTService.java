@@ -1,4 +1,4 @@
-package com.example.Ecommerce.service.JWT;
+package com.example.Ecommerce.service.Auth.JWT;
 
 import org.springframework.security.core.userdetails.UserDetails;
 

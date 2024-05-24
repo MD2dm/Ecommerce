@@ -1,29 +1,27 @@
 package com.example.Ecommerce.model;
 
+import com.example.Ecommerce.common.abstractClasses.AbstractEntity;
+import com.example.Ecommerce.common.enums.Gender;
+import com.example.Ecommerce.common.enums.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 
 @Entity
-@Data
+@Getter@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Table(name = "users")
-public class User implements UserDetails {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+public class User extends AbstractEntity implements UserDetails {
 
     @Column(name = "username", length = 50, unique = true ,nullable = false)
     private String username;
@@ -37,11 +35,14 @@ public class User implements UserDetails {
     @Column(name = "email", length = 50, unique = true ,nullable = false)
     private String email;
 
+    @Column(name = "gender", length = 20)
+    private Gender gender;
+
     @Column(name = "avatar", columnDefinition = "varchar(max)")
     @Lob
     private String avatar;
 
-    @Column(name = "date")
+    @Column(name = "birthday")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @JsonFormat(pattern = "MM/dd/yyyy")
     private Date birthday;
@@ -58,13 +59,6 @@ public class User implements UserDetails {
     @Column(name = "phone", length = 50)
     private String phone;
 
-    @Column(name = "create_at")
-    @CreationTimestamp
-    private LocalDateTime createAt;
-
-    @Column(name = "update_ad")
-    @UpdateTimestamp
-    private LocalDateTime updateAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

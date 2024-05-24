@@ -1,13 +1,12 @@
-package com.example.Ecommerce.service.JWT.Impl;
+package com.example.Ecommerce.service.Auth.JWT.Impl;
 
 import com.example.Ecommerce.repository.UserRepository;
-import com.example.Ecommerce.service.JWT.JWTUserService;
+import com.example.Ecommerce.service.Auth.JWT.JWTUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 
 @Service
 @RequiredArgsConstructor
@@ -25,4 +24,5 @@ public class JWTUserServiceImpl implements JWTUserService {
             }
         };
     }
+
 }

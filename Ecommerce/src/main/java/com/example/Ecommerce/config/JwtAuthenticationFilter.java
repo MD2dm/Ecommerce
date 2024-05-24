@@ -1,8 +1,8 @@
 package com.example.Ecommerce.config;
 
 
-import com.example.Ecommerce.service.JWT.JWTService;
-import com.example.Ecommerce.service.JWT.JWTUserService;
+import com.example.Ecommerce.service.Auth.JWT.JWTService;
+import com.example.Ecommerce.service.Auth.JWT.JWTUserService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

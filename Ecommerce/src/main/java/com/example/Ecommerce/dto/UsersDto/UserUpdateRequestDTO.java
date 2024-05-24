@@ -1,4 +1,4 @@
-package com.example.Ecommerce.dto.Users;
+package com.example.Ecommerce.dto.UsersDto;
 
 import lombok.Getter;
 
@@ -6,8 +6,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Getter
-public class UserUpdateRequest implements Serializable  {
-
+public class UserUpdateRequestDTO implements Serializable {
 
     private String email;
 

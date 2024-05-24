@@ -1,6 +1,5 @@
-package com.example.Ecommerce.dto.Users;
+package com.example.Ecommerce.dto.UsersDto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,7 +8,7 @@ import java.io.Serializable;
 
 @Getter@Setter
 @NoArgsConstructor
-public class JwtAuthenticationResponse implements Serializable {
+public class JwtAuthResponseDTO implements Serializable {
 
     private String token;
 

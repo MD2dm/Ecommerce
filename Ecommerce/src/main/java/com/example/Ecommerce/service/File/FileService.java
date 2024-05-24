@@ -1,62 +1,37 @@
 package com.example.Ecommerce.service.File;
 
-
-import lombok.RequiredArgsConstructor;
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.SdkClientException;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.core.sync.ResponseTransformer;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
+
+
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class FileService {
 
-    @Autowired
-    private final S3Client s3Client;
+    private String bucketName = "my-ecommerce-java";
+    Regions regions = Regions.US_WEST_2;
 
-    @Value("${bucket.name}")
-    private String bucketName;
+    public void uploadToS3(InputStream inputStream, String filename, String contentType) throws IOException,
+            AmazonServiceException, SdkClientException {
 
-    public String upload(MultipartFile avatarFile) throws IOException {
-        try {
-            String key = generateUniqueKey(avatarFile.getOriginalFilename());
-            String fileUrl = String.format("https://%s.s3.amazonaws.com/%s", bucketName, key);
-            s3Client.putObject(PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .build(), RequestBody.fromBytes(avatarFile.getBytes()));
-            return fileUrl;
-        } catch (S3Exception e) {
-            throw new IOException("Failed to upload avatar to S3", e);
-        }
-    }
+        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
+                .withRegion(regions).build();
 
-    public InputStream downloadFile(String key) throws IOException {
-        try {
-            ResponseBytes<GetObjectResponse> objectResponse = s3Client.getObject(GetObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(key)
-                    .build(), ResponseTransformer.toBytes());
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(contentType);
+        metadata.setContentLength(inputStream.available());
 
-            return objectResponse.asInputStream();
-        } catch (S3Exception e) {
-            throw new IOException("Failed to download file from S3", e);
-        }
-    }
-
-    private String generateUniqueKey(String originalFilename) {
-        return UUID.randomUUID().toString() + "_" + originalFilename;
+        PutObjectRequest request = new PutObjectRequest(bucketName, filename, inputStream, metadata);
+        s3Client.putObject(request);
     }
 }
