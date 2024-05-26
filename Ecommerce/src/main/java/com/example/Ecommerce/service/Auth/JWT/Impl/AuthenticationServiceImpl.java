@@ -112,13 +112,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public JwtAuthResponseDTO login (LoginRequestDTO request){
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
-            var user = userRepository.findByUsername(request.getUsername())
-                    .orElseThrow(() -> new IllegalArgumentException("Username or password is incorrect"));
-
 
             var jwt = jwtService.generateToken(user);
             var refreshToken = jwtService.generateRefreshTokenToken(new HashMap<>(), user);

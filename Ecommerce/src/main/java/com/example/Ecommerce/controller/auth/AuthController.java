@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -79,12 +80,13 @@ public class AuthController {
     public ResponseEntity<ResponseData<JwtAuthResponseDTO>> login(@RequestBody LoginRequestDTO request) {
         try {
             JwtAuthResponseDTO jwt = authenticationService.login(request);
-            return ResponseEntity.ok(new ResponseData<>(201, "Login successful", jwt));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseData<>(401, "Invalid credentials"));
+            return ResponseEntity.ok(new ResponseData<>(200, "Login successful", jwt));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode())
+                    .body(new ResponseData<>(e.getStatusCode().value(), e.getReason()));
         }
     }
+
 
 
     @Operation(summary = "Log Out Account User")
