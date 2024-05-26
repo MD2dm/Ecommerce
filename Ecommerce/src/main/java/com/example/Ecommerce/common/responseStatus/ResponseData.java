@@ -1,9 +1,10 @@
-package com.example.Ecommerce.dto.ResponseStatus;
+package com.example.Ecommerce.common.responseStatus;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
 @Getter
+
 public class ResponseData<T> {
 
     private final int status;
@@ -23,4 +24,5 @@ public class ResponseData<T> {
         this.message = message;
         this.data = data;
     }
+
 }

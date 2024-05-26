@@ -15,4 +15,6 @@ public interface AuthenticationService {
     JwtAuthResponseDTO refreshToken(RefreshTokenRequestDTO request);
 
     User verifyOtp(String email, String otp);
+
+
 }

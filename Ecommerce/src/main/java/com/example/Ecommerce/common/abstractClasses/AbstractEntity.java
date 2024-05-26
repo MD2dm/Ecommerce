@@ -13,7 +13,13 @@ import java.time.LocalDateTime;
 public abstract class AbstractEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "custom_sequence")
+    @SequenceGenerator(
+            name = "custom_sequence",
+            sequenceName = "start_from_100000",
+            initialValue = 100000,
+            allocationSize = 1
+    )
     private Long Id;
 
     @Column(name = "create_at")

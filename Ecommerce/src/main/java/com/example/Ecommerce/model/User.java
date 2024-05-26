@@ -59,6 +59,8 @@ public class User extends AbstractEntity implements UserDetails {
     @Column(name = "phone", length = 50)
     private String phone;
 
+    private boolean isVerified;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

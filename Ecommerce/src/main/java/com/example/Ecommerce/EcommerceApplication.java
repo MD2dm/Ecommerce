@@ -33,6 +33,7 @@ public class EcommerceApplication implements CommandLineRunner {
 			user.setGender(Gender.MALE);
 			user.setLastName("admin");
 			user.setRole(Role.ADMIN);
+			user.setVerified(true);
 			user.setPassword(new BCryptPasswordEncoder().encode("admin"));
 
 			userRepository.save(user);

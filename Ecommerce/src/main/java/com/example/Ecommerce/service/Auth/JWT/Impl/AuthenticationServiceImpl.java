@@ -2,6 +2,8 @@ package com.example.Ecommerce.service.Auth.JWT.Impl;
 
 import com.example.Ecommerce.common.enums.Role;
 import com.example.Ecommerce.common.exceptionHandling.DuplicateEntryException;
+import com.example.Ecommerce.common.otp.TemporaryStorage;
+import com.example.Ecommerce.dto.OtpDto.OtpDataDTO;
 import com.example.Ecommerce.dto.UsersDto.JwtAuthResponseDTO;
 import com.example.Ecommerce.dto.UsersDto.LoginRequestDTO;
 import com.example.Ecommerce.dto.UsersDto.RefreshTokenRequestDTO;
@@ -22,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -45,64 +45,66 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Autowired
     private EmailService emailService;
 
-    private final Map<String, RegisterRequestDTO> temporaryRegistrationStorage = new ConcurrentHashMap<>();
-    private final Map<String, String> otpStorage = new ConcurrentHashMap<>();
+    @Autowired
+    private TemporaryStorage temporaryStorage;
+
 
 
     @Override
-    public void register(RegisterRequestDTO request){
-
+    public void register(RegisterRequestDTO request) {
         String password = request.getPassword();
         if (password.length() < 8 || !password.matches(".*[A-Z].*")) {
             throw new RuntimeException("Password must be at least 8 characters long and contain at least one uppercase letter");
         }
 
-        User user = new User();
-
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new DuplicateEntryException("Username already exists");
-        } else {
-            user.setUsername(request.getUsername());
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateEntryException("Email already exists");
-        } else {
-            user.setEmail(request.getEmail());
         }
 
         if (userRepository.existsByPhone(request.getPhone())) {
             throw new DuplicateEntryException("Phone already exists");
-        } else {
-            user.setPhone(request.getPhone());
         }
 
         String otp = generateOtp();
-        temporaryRegistrationStorage.put(request.getEmail(), request);
-        otpStorage.put(request.getEmail(), otp);
-        emailService.sendEmail(request.getEmail(), "Verify OTP", "Your OTP is: " + otp);
+        long expiryTime = System.currentTimeMillis() + (5 * 60 * 1000);
+        temporaryStorage.storeRegistration(request.getEmail(), request);
+        temporaryStorage.storeOtp(request.getEmail(), otp, expiryTime);
+        emailService.sendOtp(request.getEmail(), otp);
     }
 
+    @Override
     public User verifyOtp(String email, String otp) {
-        String storedOtp = otpStorage.get(email);
-        if (storedOtp != null && storedOtp.equals(otp)) {
-            RegisterRequestDTO request = temporaryRegistrationStorage.get(email);
-            if (request != null) {
-                User user = new User();
-                user.setUsername(request.getUsername());
-                user.setEmail(request.getEmail());
-                user.setPhone(request.getPhone());
-                user.setGender(request.getGender());
-                user.setFirstName(request.getFirstname());
-                user.setLastName(request.getLastname());
-                user.setRole(Role.CUSTOMER);
-                user.setPassword(passwordEncoder.encode(request.getPassword()));
-                userRepository.save(user);
+        OtpDataDTO otpData = temporaryStorage.getOtpData(email);
+        if (otpData != null) {
+            if (otpData.getExpiryTime() < System.currentTimeMillis()) {
+                temporaryStorage.removeOtp(email);
+                throw new RuntimeException("OTP has expired");
+            }
+            if (otpData.getOtp().equals(otp)) {
+                RegisterRequestDTO request = temporaryStorage.getRegistration(email);
+                if (request != null) {
+                    User user = new User();
+                    user.setUsername(request.getUsername());
+                    user.setEmail(request.getEmail());
+                    user.setPhone(request.getPhone());
+                    user.setGender(request.getGender());
+                    user.setFirstName(request.getFirstname());
+                    user.setLastName(request.getLastname());
+                    user.setRole(Role.CUSTOMER);
+                    user.setPassword(passwordEncoder.encode(request.getPassword()));
+                    user.setVerified(true);
 
-                //Delete temporary data
-                temporaryRegistrationStorage.remove(email);
-                otpStorage.remove(email);
-                return user;
+                    userRepository.save(user);
+
+                    // Delete temporary data
+                    temporaryStorage.removeRegistration(email);
+                    temporaryStorage.removeOtp(email);
+                    return user;
+                }
             }
         }
         throw new RuntimeException("Invalid OTP");
@@ -131,6 +133,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
+
     @Override
     public JwtAuthResponseDTO refreshToken(RefreshTokenRequestDTO request){
         String userName = jwtService.extractUsername(request.getToken());
@@ -149,6 +152,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private String generateOtp() {
-        return String.valueOf((int) (Math.random() * 900000) + 100000);
+        Random random = new Random();
+        return String.format("%06d", random.nextInt(999999));
     }
 }

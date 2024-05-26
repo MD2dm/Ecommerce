@@ -1,8 +1,9 @@
 package com.example.Ecommerce.controller.Users;
 
 
-import com.example.Ecommerce.dto.ResponseStatus.ResponseData;
-import com.example.Ecommerce.dto.ResponseStatus.ResponseError;
+
+import com.example.Ecommerce.common.responseStatus.ResponseData;
+import com.example.Ecommerce.common.responseStatus.ResponseError;
 import com.example.Ecommerce.dto.UsersDto.UserUpdateRequestDTO;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.service.User.UserService;

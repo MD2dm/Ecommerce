@@ -1,10 +1,9 @@
 package com.example.Ecommerce.controller.auth;
 
 
-import com.example.Ecommerce.dto.ResponseStatus.ResponseData;
+import com.example.Ecommerce.common.responseStatus.ResponseData;
 import com.example.Ecommerce.dto.UsersDto.JwtAuthResponseDTO;
 import com.example.Ecommerce.dto.UsersDto.LoginRequestDTO;
-import com.example.Ecommerce.dto.UsersDto.RefreshTokenRequestDTO;
 import com.example.Ecommerce.dto.UsersDto.RegisterRequestDTO;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.repository.UserRepository;
@@ -14,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,9 +25,10 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Authentication Controller")
 public class AuthController {
 
-
+    @Autowired
     private final AuthenticationService authenticationService;
 
+    @Autowired
     private final UserRepository userRepository;
 
     @Operation(summary = "Register Account User")
@@ -85,12 +86,6 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "Refresher Token User's")
-    @PostMapping("/refresh")
-    public ResponseData<JwtAuthResponseDTO> refreshToken(@RequestBody RefreshTokenRequestDTO request){
-        JwtAuthResponseDTO jwtRefreshToken = authenticationService.refreshToken(request);
-        return new ResponseData<>(202, "RefreshToken successful", jwtRefreshToken);
-    }
 
     @Operation(summary = "Log Out Account User")
     @PostMapping("/logout")
