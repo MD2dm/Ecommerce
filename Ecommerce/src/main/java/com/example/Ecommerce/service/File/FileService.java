@@ -1,37 +1,44 @@
 package com.example.Ecommerce.service.File;
 
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.SdkClientException;
-import com.amazonaws.regions.Regions;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-
-
+import javax.xml.crypto.Data;
+import java.awt.*;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 
 @Service
 public class FileService {
 
-    private String bucketName = "my-ecommerce-java";
-    Regions regions = Regions.US_WEST_2;
+    @Autowired
+    private AmazonS3 amazonS3;
 
-    public void uploadToS3(InputStream inputStream, String filename, String contentType) throws IOException,
-            AmazonServiceException, SdkClientException {
+    @Value("${aws.bucket}")
+    private String bucketName;
 
-        AmazonS3 s3Client = AmazonS3ClientBuilder.standard()
-                .withRegion(regions).build();
+    public String generateUrl(String filename, HttpMethod http){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.MINUTE,1);
+        URL url = amazonS3.generatePresignedUrl(bucketName,filename,calendar.getTime(),http);
+        return url.toString();
+    }
 
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(contentType);
-        metadata.setContentLength(inputStream.available());
+    public String uploadFile(MultipartFile file) throws IOException {
+        String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
 
-        PutObjectRequest request = new PutObjectRequest(bucketName, filename, inputStream, metadata);
-        s3Client.putObject(request);
+        amazonS3.putObject(new PutObjectRequest(bucketName, filename, file.getInputStream(), null)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+
+        return amazonS3.getUrl(bucketName, filename).toString();
     }
 }

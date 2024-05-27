@@ -9,6 +9,7 @@ import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.service.User.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -54,24 +57,16 @@ public class UserController {
     }
 
     @Operation(summary = "Update Info User")
-    @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<?> updateUser(
-            @PathVariable Long id,
-            @RequestBody UserUpdateRequestDTO request,
-            @RequestParam(value = "avatar", required = false) MultipartFile avatar
-    ) {
-        try {
-            ResponseEntity<User> responseEntity = userService.updateUser(id, request, avatar);
-            if (responseEntity.getStatusCode() == HttpStatus.OK) {
-                User updatedUser = responseEntity.getBody();
-                return ResponseEntity.ok(updatedUser);
-            } else {
-                return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
-            }
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to update user: " + e.getMessage());
+    @PutMapping("/{userId}")
+    public ResponseEntity<User> updateUser(@PathVariable Long userId,
+                                           @Valid @RequestBody UserUpdateRequestDTO request,
+                                           @RequestPart(name = "avatar", required = false) MultipartFile avatar) throws IOException {
+        ResponseEntity<User> response;
+        if (avatar != null && !avatar.isEmpty()) {
+            response = userService.updateUser(userId, request, avatar);
+        } else {
+            response = userService.updateUser(userId, request, null);
         }
+        return response;
     }
 }

@@ -36,20 +36,19 @@ public class SecurityConfiguration {
     private final JWTUserService jwtUserService;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws  Exception{
-        http.csrf(AbstractHttpConfigurer::disable)
-
-                .authorizeHttpRequests(request -> request
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/admin").hasAnyAuthority(Role.ADMIN.name())
-                        .requestMatchers("/api/v1/sellers/**").hasAnyAuthority(Role.SELLER.name())
-                        .requestMatchers("/api/v1/customers/**").hasAnyAuthority(Role.CUSTOMER.name())
+                        .requestMatchers("/api/v1/admin/**").hasAuthority(Role.ADMIN.name())
+                        .requestMatchers("/api/v1/sellers/**").hasAuthority(Role.SELLER.name())
+                        .requestMatchers("/api/v1/customers/**").hasAuthority(Role.CUSTOMER.name())
+                        .requestMatchers("/api/v1/analysis/**").hasAuthority(Role.SELLER.name())
+                        .requestMatchers("/api/v1/register-seller").hasAuthority(Role.CUSTOMER.name())
+                        .requestMatchers("/api/v1/cart/**", "/api/v1/orders/**", "/api/v1/checkout/**").authenticated()
                         .requestMatchers("/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/register-seller").hasAuthority(Role.CUSTOMER.name())
-
-                        .anyRequest()
-                        .authenticated())
-
-
+                        .anyRequest().authenticated()
+                )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

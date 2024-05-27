@@ -74,7 +74,6 @@ public class AuthController {
         }
     }
 
-
     @Operation(summary = "Login Account User")
     @PostMapping("/login")
     public ResponseEntity<ResponseData<JwtAuthResponseDTO>> login(@RequestBody LoginRequestDTO request) {
@@ -86,8 +85,6 @@ public class AuthController {
                     .body(new ResponseData<>(e.getStatusCode().value(), e.getReason()));
         }
     }
-
-
 
     @Operation(summary = "Log Out Account User")
     @PostMapping("/logout")
