@@ -1,6 +1,4 @@
-package com.example.Ecommerce.controller.Users;
-
-
+package com.example.Ecommerce.controller.CustomerController.Users;
 
 import com.example.Ecommerce.common.responseStatus.ResponseData;
 import com.example.Ecommerce.common.responseStatus.ResponseError;
@@ -26,7 +24,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Tag(name = "Users Controller")
 public class UserController {
-
     @Autowired
     private final UserService userService;
 

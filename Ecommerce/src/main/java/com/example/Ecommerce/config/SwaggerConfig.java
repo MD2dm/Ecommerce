@@ -46,9 +46,41 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi groupedOpenApi(){
+    public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
-                .group("API-Service-1")
+                .group("admin")
+                .packagesToScan("com.example.Ecommerce.controller.AdminController")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi customerApi() {
+        return GroupedOpenApi.builder()
+                .group("customer")
+                .packagesToScan("com.example.Ecommerce.controller.CustomerController")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi sellerApi() {
+        return GroupedOpenApi.builder()
+                .group("seller")
+                .packagesToScan("com.example.Ecommerce.controller.SellerController")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi authApi() {
+        return GroupedOpenApi.builder()
+                .group("auth")
+                .packagesToScan("com.example.Ecommerce.controller.auth")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi allApi(){
+        return GroupedOpenApi.builder()
+                .group("All API")
                 .packagesToScan("com.example.Ecommerce.controller")
                 .build();
     }
