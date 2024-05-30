@@ -9,5 +9,5 @@ import java.io.IOException;
 
 public interface UserService {
 
-    ResponseEntity<User> updateUser(Long userId, UserUpdateRequestDTO request, MultipartFile avatar) throws  IOException;
+    ResponseEntity<User> updateUser(Long userId, UserUpdateRequestDTO request, MultipartFile avatar) throws IOException;
 }

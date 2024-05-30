@@ -3,17 +3,12 @@ package com.example.Ecommerce.dto.AdminDto;
 import com.example.Ecommerce.common.enums.Gender;
 import com.example.Ecommerce.common.enums.Role;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Setter
@@ -44,8 +39,8 @@ public class ResponseInfoAllUsersDTO implements Serializable {
     private Role role;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime createAt;
+    private Date createAt;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime updateAt;
+    private Date updateAt;
 }

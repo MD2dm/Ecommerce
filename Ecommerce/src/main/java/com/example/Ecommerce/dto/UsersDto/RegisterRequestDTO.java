@@ -2,6 +2,7 @@ package com.example.Ecommerce.dto.UsersDto;
 
 
 import com.example.Ecommerce.common.enums.Gender;
+import com.example.Ecommerce.common.enums.Role;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,5 +26,7 @@ public class RegisterRequestDTO implements Serializable {
     private String firstname;
 
     private String lastname;
+
+    private Role role;
 
 }

@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -94,7 +95,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     user.setGender(request.getGender());
                     user.setFirstName(request.getFirstname());
                     user.setLastName(request.getLastname());
-                    user.setRole(Role.CUSTOMER);
+                    user.setRole(request.getRole());
                     user.setPassword(passwordEncoder.encode(request.getPassword()));
                     user.setVerified(true);
 
@@ -149,6 +150,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return  jwtAuthenticationResponse;
         }
         return null;
+    }
+
+    @Override
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     }
 
     private String generateOtp() {

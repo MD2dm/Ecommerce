@@ -33,7 +33,7 @@ public class AdminSaveController {
     @Autowired
     private final CategoryService categoryService;
 
-    @Operation(summary = "Register Account User By Admin")
+    @Operation(summary = "Add Account User By Admin")
     @PostMapping("/register")
     public ResponseEntity<ResponseData<Void>> register(@RequestBody RegisterRequestDTO request) {
         // Check username, email, phone, password

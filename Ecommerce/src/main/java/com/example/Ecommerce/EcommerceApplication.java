@@ -10,9 +10,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.Date;
 
 @SpringBootApplication
-public class EcommerceApplication implements CommandLineRunner {
+public class EcommerceApplication  implements CommandLineRunner {
 
 	@Autowired
 	private UserRepository userRepository;
@@ -28,9 +29,10 @@ public class EcommerceApplication implements CommandLineRunner {
 			User user = new User();
 
 			user.setUsername("admin");
-			user.setEmail("admin");
+			user.setEmail("dungtuyen203@gmail.com");
 			user.setFirstName("admin");
 			user.setGender(Gender.MALE);
+			user.setBirthday(new Date(103, 2, 2));
 			user.setLastName("admin");
 			user.setRole(Role.ADMIN);
 			user.setVerified(true);
@@ -39,4 +41,5 @@ public class EcommerceApplication implements CommandLineRunner {
 			userRepository.save(user);
 		}
 	}
+
 }

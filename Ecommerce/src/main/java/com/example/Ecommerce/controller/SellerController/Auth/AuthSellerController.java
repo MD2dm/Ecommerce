@@ -1,0 +1,125 @@
+package com.example.Ecommerce.controller.SellerController.Auth;
+
+import ch.qos.logback.classic.Logger;
+import com.example.Ecommerce.common.enums.Role;
+import com.example.Ecommerce.common.responseStatus.ResponseData;
+import com.example.Ecommerce.common.responseStatus.ResponseError;
+import com.example.Ecommerce.dto.SellerDto.Mapper.SellerInfoMapper;
+import com.example.Ecommerce.dto.SellerDto.Response.ResponseInfoSeller.RequestInfoSellerDTO;
+import com.example.Ecommerce.dto.UsersDto.JwtAuthResponseDTO;
+import com.example.Ecommerce.dto.UsersDto.LoginRequestDTO;
+import com.example.Ecommerce.dto.UsersDto.RegisterRequestDTO;
+import com.example.Ecommerce.model.User;
+import com.example.Ecommerce.repository.UserRepository;
+import com.example.Ecommerce.service.Auth.JWT.AuthenticationService;
+import com.example.Ecommerce.service.User.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.security.Principal;
+
+@RestController
+@RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
+@Tag(name = "Seller Auth Controller")
+public class AuthSellerController {
+
+    @Autowired
+    private final AuthenticationService authenticationService;
+
+    @Autowired
+    private final UserRepository userRepository;
+
+
+    @Operation(summary = "Register Account User")
+    @PostMapping("/sellers/register")
+    public ResponseEntity<ResponseData<Void>> registerCustomer(@RequestBody RegisterRequestDTO request) {
+        request.setRole(Role.SELLER);
+        return registerUser(request);
+    }
+
+    @Operation(summary = "Verify OTP and Complete Registration")
+    @PostMapping("/sellers/verify-otp")
+    public ResponseEntity<ResponseData<User>> verifyOtp(@RequestParam String email, @RequestParam String otp) {
+        try {
+            User user = authenticationService.verifyOtp(email, otp);
+            return ResponseEntity.ok(new ResponseData<>(201, "User registered successfully", user));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseData<>(401, "Invalid OTP", null));
+        }
+    }
+
+    @Operation(summary = "Login Account User")
+    @PostMapping("/sellers/login")
+    public ResponseEntity<ResponseData<JwtAuthResponseDTO>> login(@RequestBody LoginRequestDTO request) {
+        try {
+            JwtAuthResponseDTO jwt = authenticationService.login(request);
+            return ResponseEntity.ok(new ResponseData<>(200, "Login successful", jwt));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode())
+                    .body(new ResponseData<>(e.getStatusCode().value(), e.getReason()));
+        }
+    }
+
+    @Operation(summary = "Get info Seller")
+    @GetMapping("/sellers/info")
+    public ResponseEntity<?> getUserInfo(Principal principal) {
+        try {
+            User user = authenticationService.getUserByUsername(principal.getName());
+            RequestInfoSellerDTO requestInfoSellerDTO = SellerInfoMapper.infoSellerDTO(user);
+
+            return ResponseEntity.ok(new ResponseData<>(200, "Retrieve seller information successfully", requestInfoSellerDTO));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseData<>(404, "Seller information does not exist", null));
+        }
+    }
+
+    @Operation(summary = "Log Out Account User")
+    @PostMapping("/sellers/logout")
+    public ResponseData<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        SecurityContextHolder.clearContext();
+        return new ResponseData<>(204, "Logout successful");
+    }
+
+    //Check users
+    private ResponseEntity<ResponseData<Void>> registerUser(RegisterRequestDTO request) {
+        // Check username, email, phone, password
+        if (userRepository.existsByUsername(request.getUsername())) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponseData<>(400, "Username already exists", null));
+        }
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponseData<>(400, "Email already exists", null));
+        }
+
+        if (userRepository.existsByPhone(request.getPhone())) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponseData<>(400, "Phone already exists", null));
+        }
+
+        String password = request.getPassword();
+        if (password.length() < 8 || !password.matches(".*[A-Z].*")) {
+            return ResponseEntity.badRequest()
+                    .body(new ResponseData<>(400, "Password must be at least 8 characters long and contain at least one uppercase letter", null));
+        }
+
+        authenticationService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ResponseData<>(201, "OTP sent to email. Please verify.", null));
+    }
+}

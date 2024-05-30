@@ -1,4 +1,4 @@
-package com.example.Ecommerce.service.File;
+package com.example.Ecommerce.common.File;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
@@ -9,20 +9,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.xml.crypto.Data;
-import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
 
 @Service
-public class FileService {
+public class S3Service {
 
     @Autowired
     private AmazonS3 amazonS3;
 
-    @Value("${aws.bucket}")
+    @Value("${aws.s3.bucketName}")
     private String bucketName;
 
     public String generateUrl(String filename, HttpMethod http){

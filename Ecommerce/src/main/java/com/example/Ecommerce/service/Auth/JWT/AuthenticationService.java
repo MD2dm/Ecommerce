@@ -16,4 +16,6 @@ public interface AuthenticationService {
 
     User verifyOtp(String email, String otp);
 
+    User getUserByUsername(String username);
+
 }

@@ -3,16 +3,18 @@ package com.example.Ecommerce.model;
 import com.example.Ecommerce.common.abstractClasses.AbstractEntity;
 import com.example.Ecommerce.common.enums.Gender;
 import com.example.Ecommerce.common.enums.Role;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -21,7 +23,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Table(name = "users")
-public class User extends AbstractEntity implements UserDetails {
+public class User extends AbstractEntity implements UserDetails, Serializable {
 
     @Column(name = "username", length = 50, unique = true ,nullable = false)
     private String username;
@@ -29,6 +31,7 @@ public class User extends AbstractEntity implements UserDetails {
     @Column(name = "password", length = 255, nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
 
@@ -43,8 +46,7 @@ public class User extends AbstractEntity implements UserDetails {
     private String avatar;
 
     @Column(name = "birthday")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @JsonFormat(pattern = "MM/dd/yyyy")
+    @Temporal(TemporalType.DATE)
     private Date birthday;
 
     @Column(name = "first_name", length = 50,nullable = false)
@@ -59,8 +61,22 @@ public class User extends AbstractEntity implements UserDetails {
     @Column(name = "phone", length = 50)
     private String phone;
 
-    private boolean isVerified;
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "customer")
+    private Set<Order> orders;
 
+    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "user")
+    private Set<PaymentMethod> paymentMethods;
+
+    @JsonManagedReference
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "customer")
+    private Cart cart;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "user", optional = false)
+    private Shop shop;
+
+    private boolean isVerified;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

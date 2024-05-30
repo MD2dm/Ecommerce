@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
 import java.util.List;
 
 @Configuration
@@ -66,14 +67,6 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("seller")
                 .packagesToScan("com.example.Ecommerce.controller.SellerController")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi authApi() {
-        return GroupedOpenApi.builder()
-                .group("auth")
-                .packagesToScan("com.example.Ecommerce.controller.auth")
                 .build();
     }
 

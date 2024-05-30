@@ -1,6 +1,6 @@
-package com.example.Ecommerce.controller.auth;
+package com.example.Ecommerce.controller.CustomerController.Users;
 
-
+import com.example.Ecommerce.common.enums.Role;
 import com.example.Ecommerce.common.responseStatus.ResponseData;
 import com.example.Ecommerce.dto.UsersDto.JwtAuthResponseDTO;
 import com.example.Ecommerce.dto.UsersDto.LoginRequestDTO;
@@ -23,8 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication Controller")
-public class AuthController {
+@Tag(name = "Customer Auth Controller")
+public class AuthCustomerController {
 
     @Autowired
     private final AuthenticationService authenticationService;
@@ -33,8 +33,45 @@ public class AuthController {
     private final UserRepository userRepository;
 
     @Operation(summary = "Register Account User")
-    @PostMapping("/register")
-    public ResponseEntity<ResponseData<Void>> register(@RequestBody RegisterRequestDTO request) {
+    @PostMapping("/customers/register")
+    public ResponseEntity<ResponseData<Void>> registerCustomer(@RequestBody RegisterRequestDTO request) {
+        request.setRole(Role.CUSTOMER);
+        return registerUser(request);
+    }
+
+    @Operation(summary = "Verify OTP and Complete Registration")
+    @PostMapping("/customers/verify-otp")
+    public ResponseEntity<ResponseData<User>> verifyOtp(@RequestParam String email, @RequestParam String otp) {
+        try {
+            User user = authenticationService.verifyOtp(email, otp);
+            return ResponseEntity.ok(new ResponseData<>(201, "User registered successfully", user));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseData<>(401, "Invalid OTP", null));
+        }
+    }
+
+    @Operation(summary = "Login Account User")
+    @PostMapping("/customers/login")
+    public ResponseEntity<ResponseData<JwtAuthResponseDTO>> login(@RequestBody LoginRequestDTO request) {
+        try {
+            JwtAuthResponseDTO jwt = authenticationService.login(request);
+            return ResponseEntity.ok(new ResponseData<>(200, "Login successful", jwt));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode())
+                    .body(new ResponseData<>(e.getStatusCode().value(), e.getReason()));
+        }
+    }
+
+    @Operation(summary = "Log Out Account User")
+    @PostMapping("/customers/logout")
+    public ResponseData<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        SecurityContextHolder.clearContext();
+        return new ResponseData<>(204, "Logout successful");
+    }
+
+
+    private ResponseEntity<ResponseData<Void>> registerUser(RegisterRequestDTO request) {
         // Check username, email, phone, password
         if (userRepository.existsByUsername(request.getUsername())) {
             return ResponseEntity.badRequest()
@@ -60,36 +97,5 @@ public class AuthController {
         authenticationService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ResponseData<>(201, "OTP sent to email. Please verify.", null));
-    }
-
-    @Operation(summary = "Verify OTP and Complete Registration")
-    @PostMapping("/verify-otp")
-    public ResponseEntity<ResponseData<User>> verifyOtp(@RequestParam String email, @RequestParam String otp) {
-        try {
-            User user = authenticationService.verifyOtp(email, otp);
-            return ResponseEntity.ok(new ResponseData<>(201, "User registered successfully", user));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ResponseData<>(401, "Invalid OTP", null));
-        }
-    }
-
-    @Operation(summary = "Login Account User")
-    @PostMapping("/login")
-    public ResponseEntity<ResponseData<JwtAuthResponseDTO>> login(@RequestBody LoginRequestDTO request) {
-        try {
-            JwtAuthResponseDTO jwt = authenticationService.login(request);
-            return ResponseEntity.ok(new ResponseData<>(200, "Login successful", jwt));
-        } catch (ResponseStatusException e) {
-            return ResponseEntity.status(e.getStatusCode())
-                    .body(new ResponseData<>(e.getStatusCode().value(), e.getReason()));
-        }
-    }
-
-    @Operation(summary = "Log Out Account User")
-    @PostMapping("/logout")
-    public ResponseData<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        SecurityContextHolder.clearContext();
-        return new ResponseData<>(204, "Logout successful");
     }
 }
