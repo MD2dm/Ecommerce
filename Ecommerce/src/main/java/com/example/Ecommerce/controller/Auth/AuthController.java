@@ -2,9 +2,13 @@ package com.example.Ecommerce.controller.Auth;
 
 import com.example.Ecommerce.common.enums.Role;
 import com.example.Ecommerce.common.responseStatus.ResponseData;
+import com.example.Ecommerce.common.responseStatus.ResponseError;
 import com.example.Ecommerce.dto.AuthDto.JwtAuthResponseDTO;
 import com.example.Ecommerce.dto.AuthDto.LoginRequestDTO;
 import com.example.Ecommerce.dto.AuthDto.RegisterRequestDTO;
+import com.example.Ecommerce.dto.OtpDto.ForgotPasswordRequestDTO;
+import com.example.Ecommerce.dto.OtpDto.ResetPasswordRequestDTO;
+import com.example.Ecommerce.dto.OtpDto.VerifyOtpRequestDTO;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.repository.UserRepository;
 import com.example.Ecommerce.service.Auth.JWT.AuthenticationService;
@@ -70,8 +74,8 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "Login Account User")
-    @PostMapping("admin/login")
+    @Operation(summary = "Login Account Admin")
+    @PostMapping("/admin/login")
     public ResponseEntity<ResponseData<JwtAuthResponseDTO>> loginAdmin(@RequestBody LoginRequestDTO request) {
         try {
             JwtAuthResponseDTO jwt = authenticationService.login(request);
@@ -79,6 +83,45 @@ public class AuthController {
         } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode())
                     .body(new ResponseData<>(e.getStatusCode().value(), e.getReason()));
+        }
+    }
+
+    @Operation(summary = "Request forgot pasword")
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequestDTO request) {
+        try {
+            authenticationService.requestPasswordReset(request.getEmail());
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ResponseData<>(201, "OTP sent to email. Please verify.", null));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseError(404, "User does not exist"));
+        }
+    }
+
+    @Operation(summary = "Verify OTP after request forgot password")
+    @PostMapping("/password-reset/verify-otp")
+    public ResponseEntity<?> verifyOtp(@RequestBody VerifyOtpRequestDTO request) {
+        try{
+            authenticationService.verifyOtpReset(request.getEmail(), request.getOtp());
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ResponseData<>(201, "Valid OTP", null));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseError(400, "Invalid OTP"));
+        }
+    }
+
+    @Operation(summary = "Set new password")
+    @PostMapping("/reset-password")
+    public ResponseEntity<?>  resetPassword(@RequestBody ResetPasswordRequestDTO request) {
+        try{
+            authenticationService.resetPassword(request.getEmail(), request.getNewPassword(), request.getReEnterPassword());
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new ResponseData<>(201, "Password has been updated successfully", null));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseError(400, "Password update failed"));
         }
     }
 

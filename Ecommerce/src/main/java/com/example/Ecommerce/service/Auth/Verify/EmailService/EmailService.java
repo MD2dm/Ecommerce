@@ -14,8 +14,6 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-
-
     public void sendOtp(String to, String otp) {
 
         SimpleMailMessage message = new SimpleMailMessage();
@@ -32,6 +30,14 @@ public class EmailService {
                 "Thank you for registering with us. We hope you enjoy your experience!";
 
         message.setText(emailMessage);
+        mailSender.send(message);
+    }
+
+    public void sendPasswordResetEmail(String email, String otp) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Password Reset OTP");
+        message.setText("Your OTP for password reset is: " + otp);
         mailSender.send(message);
     }
 }

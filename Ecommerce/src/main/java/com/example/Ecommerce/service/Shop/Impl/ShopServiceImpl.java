@@ -26,23 +26,29 @@ public class ShopServiceImpl implements ShopService {
     @Autowired
     private UserRepository userRepository;
 
-    @Override
     @Transactional
-    public Shop saveShop(CreateShopDTO request,User user) throws AccessDeniedException {
-        if (user.getRole() == Role.SELLER) {
-            Shop shop = new Shop();
+    public Shop saveShop(Long id,CreateShopDTO request) throws Exception {
 
-            shop.setShopName(request.getShopName());
-            shop.setShopAddress(request.getShopAddress());
-            shop.setShopPhone(request.getShopPhone());
-
-            Shop savedShop = shopRepository.save(shop);
-            user.setShop(savedShop);
-            userRepository.save(user);
-
-            return savedShop;
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (user.getRole() == Role.SELLER) {
+                if (user.getShop() != null) {
+                    throw new Exception("User already has a shop");
+                }
+                Shop shop = new Shop();
+                shop.setShopName(request.getShopName());
+                shop.setShopAddress(request.getShopAddress());
+                shop.setShopPhone(request.getShopPhone());
+                shop.setUser(user);
+                user.setShop(shop);
+                userRepository.save(user);  // Save both user and shop due to cascading
+                return shop;
+            } else {
+                throw new Exception("User is not a seller");
+            }
         } else {
-            throw new AccessDeniedException("User is not a seller");
+            throw new Exception("User not found");
         }
     }
 }

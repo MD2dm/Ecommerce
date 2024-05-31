@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -22,7 +23,7 @@ import java.nio.file.AccessDeniedException;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/sellers")
 @RequiredArgsConstructor
 @Tag(name = "Seller Shop Controller")
 public class ShopController {
@@ -34,19 +35,18 @@ public class ShopController {
     private final ShopService shopService;
 
     @Operation(summary = "API add Shop by Seller")
-    @PostMapping("/sellers/shop/add")
-    public ResponseEntity<Object> addCategory(@RequestBody CreateShopDTO request,  Principal principal){
-        User user = (User) ((Authentication) principal).getPrincipal();
+    @PostMapping("/shop/add")
+    public ResponseEntity<?> createShopForLoggedInUser(@RequestBody CreateShopDTO createShopDTO,
+                                                       Authentication authentication) {
         try{
-            Shop shop = shopService.saveShop(request, user);
-
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ResponseData<>(201, "Create hop successfully", shop));
-        } catch (ResponseStatusException e){
-            return ResponseEntity.status(e.getStatusCode())
-                    .body(new ResponseData<>(e.getStatusCode().value(), e.getReason()));
-        } catch (AccessDeniedException e) {
-            throw new RuntimeException(e);
+            User user = (User) authentication.getPrincipal();
+            Long loggedInUserId = user.getId();
+            Shop shop = shopService.saveShop(loggedInUserId, createShopDTO);
+            return ResponseEntity.ok(shop);
+//            return ResponseEntity.status(HttpStatus.CREATED)
+//                    .body(new ResponseData<>(201, "Create hop successfully", shop));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }

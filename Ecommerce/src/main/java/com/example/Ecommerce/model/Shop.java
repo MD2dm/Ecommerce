@@ -1,6 +1,7 @@
 package com.example.Ecommerce.model;
 
 import com.example.Ecommerce.common.abstractClasses.AbstractEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +27,7 @@ public class Shop extends AbstractEntity {
 
     @OneToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "shop")

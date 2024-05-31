@@ -3,6 +3,7 @@ package com.example.Ecommerce.model;
 import com.example.Ecommerce.common.abstractClasses.AbstractEntity;
 import com.example.Ecommerce.common.enums.Gender;
 import com.example.Ecommerce.common.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -71,6 +72,7 @@ public class User extends AbstractEntity implements UserDetails, Serializable {
     private Cart cart;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Shop shop;
 
     private boolean isVerified;

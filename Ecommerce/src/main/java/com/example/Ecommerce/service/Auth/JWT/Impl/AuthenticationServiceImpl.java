@@ -152,6 +152,42 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    public void requestPasswordReset(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        String otp = generateOtp();
+        long expiryTime = System.currentTimeMillis() + (5 * 60 * 1000); // 5 minutes expiry
+        temporaryStorage.storeOtp(email, otp, expiryTime);
+
+        emailService.sendPasswordResetEmail(email, otp);
+    }
+
+    @Override
+    public void verifyOtpReset(String email, String otp) {
+        OtpDataDTO otpData = temporaryStorage.getOtpData(email);
+        if (otpData == null || otpData.getExpiryTime() < System.currentTimeMillis()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired OTP");
+        }
+        if (!otpData.getOtp().equals(otp)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid OTP");
+        }
+
+        // Remove OTP from temporary storage after successful verification
+        temporaryStorage.removeOtp(email);
+    }
+
+    @Override
+    public void resetPassword(String email, String newPassword, String reEnterPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepository.save(user);
+    }
+
+    @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
@@ -25,6 +24,7 @@ public class AdminDeleteController {
     @Autowired
     private final AdminService adminService;
 
+    @Autowired
     private final CategoryService categoryService;
 
     @Operation(summary = "Delete User By Id")
@@ -49,16 +49,17 @@ public class AdminDeleteController {
     public ResponseEntity<Object> deleteCategory(@PathVariable Long id){
         try {
             boolean isDeleted = categoryService.deleteCategory(id);
-            if(isDeleted){
-                return ResponseEntity.ok(new ResponseData<>(204, "Delete category successfully", null));
+            if (isDeleted) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                        .body(new ResponseData<>(204, "Delete category successfully", null));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(new ResponseData<>(404,"The requested category was not found"));
             }
-
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseError(500, "Internal Server Error"));
         }
     }
+
 }

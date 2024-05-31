@@ -42,12 +42,12 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public ResponseInfoAllUsersDTO getByEmail(String email) {
-        User user = userRepository.findByEmail(email);
-        if (user != null) {
-            return convertToDTO(user);
-        } else {
+//        User user = userRepository.findByEmail(email);
+//        if (user != null) {
+//            return convertToDTO(user);
+//        } else {
             return null;
-        }
+//        }
     }
 
     @Override

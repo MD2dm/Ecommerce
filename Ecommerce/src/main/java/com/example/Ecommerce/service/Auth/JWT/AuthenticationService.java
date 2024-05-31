@@ -18,4 +18,9 @@ public interface AuthenticationService {
 
     User getUserByUsername(String username);
 
+    void requestPasswordReset(String email);
+
+    void resetPassword(String email, String newPassword, String reEnterPassword);
+
+    void verifyOtpReset(String email, String otp);
 }
