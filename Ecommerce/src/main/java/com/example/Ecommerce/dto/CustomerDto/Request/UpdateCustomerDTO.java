@@ -1,15 +1,15 @@
-package com.example.Ecommerce.dto.UsersDto;
+package com.example.Ecommerce.dto.CustomerDto.Request;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 import java.util.Date;
 
 @Getter
-public class UserUpdateRequestDTO implements Serializable {
+@Setter
+public class UpdateCustomerDTO implements Serializable {
 
     private String email;
 
@@ -24,5 +24,4 @@ public class UserUpdateRequestDTO implements Serializable {
     private String address;
 
     private String phone;
-
 }

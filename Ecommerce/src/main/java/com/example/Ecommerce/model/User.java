@@ -61,19 +61,16 @@ public class User extends AbstractEntity implements UserDetails, Serializable {
     @Column(name = "phone", length = 50)
     private String phone;
 
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "customer")
+    @OneToMany(mappedBy = "customer")
     private Set<Order> orders;
 
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "user")
+    @OneToMany(mappedBy = "user")
     private Set<PaymentMethod> paymentMethods;
 
-    @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "customer")
+    @OneToOne(mappedBy = "customer")
     private Cart cart;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "user", optional = false)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Shop shop;
 
     private boolean isVerified;

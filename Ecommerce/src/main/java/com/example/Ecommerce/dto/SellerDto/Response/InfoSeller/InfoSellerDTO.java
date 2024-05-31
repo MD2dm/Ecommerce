@@ -1,4 +1,4 @@
-package com.example.Ecommerce.dto.SellerDto.Response.ResponseInfoSeller;
+package com.example.Ecommerce.dto.SellerDto.Response.InfoSeller;
 
 
 import com.example.Ecommerce.common.enums.Gender;
@@ -12,7 +12,7 @@ import java.util.Date;
 
 @Getter
 @Builder
-public class RequestInfoSellerDTO implements Serializable {
+public class InfoSellerDTO implements Serializable {
 
     private Long id;
 

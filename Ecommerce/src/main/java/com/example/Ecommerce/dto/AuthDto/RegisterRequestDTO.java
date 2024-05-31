@@ -1,4 +1,4 @@
-package com.example.Ecommerce.dto.UsersDto;
+package com.example.Ecommerce.dto.AuthDto;
 
 
 import com.example.Ecommerce.common.enums.Gender;
@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

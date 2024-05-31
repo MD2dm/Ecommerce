@@ -24,11 +24,11 @@ public class Shop extends AbstractEntity {
     @Column(name = "shop_phone", nullable = false)
     private String shopPhone;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @OneToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "shop")
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "shop")
     private Set<Product> products;
 
 }

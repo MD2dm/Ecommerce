@@ -15,11 +15,11 @@ import java.util.Set;
 @Table(name = "carts")
 public class Cart extends AbstractEntity {
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "customer_id", nullable = false)
     private User customer;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "cart")
+    @OneToMany(mappedBy = "cart")
     @Column(name = "cart_items")
     private Set<CartItem> cartItems;
 }

@@ -1,10 +1,7 @@
 package com.example.Ecommerce.service.User.Impl;
 
-
-
 import com.example.Ecommerce.common.File.S3Service;
-import com.example.Ecommerce.common.exceptionHandling.DuplicateEntryException;
-import com.example.Ecommerce.dto.UsersDto.UserUpdateRequestDTO;
+import com.example.Ecommerce.dto.CustomerDto.Request.UpdateCustomerDTO;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.repository.UserRepository;
 import com.example.Ecommerce.service.User.UserService;
@@ -19,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.Optional;
 
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -30,9 +26,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private final S3Service s3Service;
 
-
     @Override
-    public ResponseEntity<User> updateUser(Long userId, UserUpdateRequestDTO request, MultipartFile avatar) throws IOException {
+    public ResponseEntity<User> updateUser(Long userId, UpdateCustomerDTO request ) throws IOException {
         {
             Optional<User> optionalUser = userRepository.findById(userId);
 
@@ -47,10 +42,9 @@ public class UserServiceImpl implements UserService {
                 }
 
                 //check avatar
-                if (avatar != null && !avatar.isEmpty()) {
-                    String avatarUrl = s3Service.uploadFile(avatar);
-                    user.setAvatar(avatarUrl);
-                }
+                String avatarUrl = s3Service.uploadFile(request.getAvatar());
+                user.setAvatar(avatarUrl);
+
 
 
                 user.setBirthday(request.getBirthday());
@@ -58,12 +52,12 @@ public class UserServiceImpl implements UserService {
                 user.setLastName(request.getLastName());
                 user.setAddress(request.getAddress());
 
-                //check phone
                 if (userRepository.existsByPhone(request.getPhone())) {
                     throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone already exists");
                 } else {
                     user.setPhone(request.getPhone());
                 }
+
 
 
                 User savedUser = userRepository.save(user);
@@ -73,5 +67,9 @@ public class UserServiceImpl implements UserService {
                 return ResponseEntity.notFound().build();
             }
         }
+    }
+
+    public User findUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 }

@@ -1,7 +1,7 @@
 package com.example.Ecommerce.common.otp;
 
 import com.example.Ecommerce.dto.OtpDto.OtpDataDTO;
-import com.example.Ecommerce.dto.UsersDto.RegisterRequestDTO;
+import com.example.Ecommerce.dto.AuthDto.RegisterRequestDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

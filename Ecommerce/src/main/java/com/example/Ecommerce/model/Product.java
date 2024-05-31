@@ -33,21 +33,21 @@ public class Product extends AbstractEntity {
     @Column(name = "stock",nullable = false)
     private Integer stock;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "shop_id", nullable = false)
     private Shop shop;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "product")
+    @OneToMany(mappedBy = "product")
     private Set<OrderItem> orderItems;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "product")
+    @OneToMany(mappedBy = "product")
     private Set<Review> reviews;
 }

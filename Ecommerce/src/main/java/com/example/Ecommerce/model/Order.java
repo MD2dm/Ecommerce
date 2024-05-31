@@ -19,7 +19,7 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 public class Order extends AbstractEntity {
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     private User customer;
 
@@ -27,7 +27,7 @@ public class Order extends AbstractEntity {
     @Column(name = "order_date",nullable = false)
     private Date orderDate;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY,mappedBy = "order")
+    @OneToMany(mappedBy = "order")
     private Set<OrderItem> orderItems;
 
 }

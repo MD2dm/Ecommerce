@@ -1,4 +1,4 @@
-package com.example.Ecommerce.dto.UsersDto;
+package com.example.Ecommerce.dto.AuthDto;
 
 import lombok.Getter;
 

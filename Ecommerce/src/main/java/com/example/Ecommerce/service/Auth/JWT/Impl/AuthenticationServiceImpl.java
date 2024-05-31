@@ -1,13 +1,12 @@
 package com.example.Ecommerce.service.Auth.JWT.Impl;
 
-import com.example.Ecommerce.common.enums.Role;
 import com.example.Ecommerce.common.exceptionHandling.DuplicateEntryException;
 import com.example.Ecommerce.common.otp.TemporaryStorage;
 import com.example.Ecommerce.dto.OtpDto.OtpDataDTO;
-import com.example.Ecommerce.dto.UsersDto.JwtAuthResponseDTO;
-import com.example.Ecommerce.dto.UsersDto.LoginRequestDTO;
-import com.example.Ecommerce.dto.UsersDto.RefreshTokenRequestDTO;
-import com.example.Ecommerce.dto.UsersDto.RegisterRequestDTO;
+import com.example.Ecommerce.dto.AuthDto.JwtAuthResponseDTO;
+import com.example.Ecommerce.dto.AuthDto.LoginRequestDTO;
+import com.example.Ecommerce.dto.AuthDto.RefreshTokenRequestDTO;
+import com.example.Ecommerce.dto.AuthDto.RegisterRequestDTO;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.repository.UserRepository;
 import com.example.Ecommerce.service.Auth.JWT.AuthenticationService;

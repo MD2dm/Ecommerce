@@ -1,11 +1,11 @@
-package com.example.Ecommerce.dto.SellerDto.Mapper;
+package com.example.Ecommerce.dto.CustomerDto.Mapper;
 
-import com.example.Ecommerce.dto.SellerDto.Response.ResponseInfoSeller.RequestInfoSellerDTO;
+import com.example.Ecommerce.dto.CustomerDto.Response.InfoCustomerDTO;
 import com.example.Ecommerce.model.User;
 
-public class SellerInfoMapper {
-    public static RequestInfoSellerDTO infoSellerDTO(User user){
-        return RequestInfoSellerDTO.builder()
+public class CustomerMapper {
+    public static InfoCustomerDTO infoCustomerDTO(User user){
+        return InfoCustomerDTO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .role(user.getRole())
@@ -17,7 +17,7 @@ public class SellerInfoMapper {
                 .lastName(user.getLastName())
                 .address(user.getAddress())
                 .phone(user.getPhone())
-                .shop(user.getShop())
+                .paymentMethods(user.getPaymentMethods())
                 .build();
     }
 }

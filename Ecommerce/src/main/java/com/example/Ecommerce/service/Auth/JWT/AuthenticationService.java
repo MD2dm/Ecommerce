@@ -1,9 +1,9 @@
 package com.example.Ecommerce.service.Auth.JWT;
 
-import com.example.Ecommerce.dto.UsersDto.JwtAuthResponseDTO;
-import com.example.Ecommerce.dto.UsersDto.LoginRequestDTO;
-import com.example.Ecommerce.dto.UsersDto.RefreshTokenRequestDTO;
-import com.example.Ecommerce.dto.UsersDto.RegisterRequestDTO;
+import com.example.Ecommerce.dto.AuthDto.JwtAuthResponseDTO;
+import com.example.Ecommerce.dto.AuthDto.LoginRequestDTO;
+import com.example.Ecommerce.dto.AuthDto.RefreshTokenRequestDTO;
+import com.example.Ecommerce.dto.AuthDto.RegisterRequestDTO;
 import com.example.Ecommerce.model.User;
 
 public interface AuthenticationService {

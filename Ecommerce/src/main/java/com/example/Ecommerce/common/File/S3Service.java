@@ -3,7 +3,9 @@ package com.example.Ecommerce.common.File;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class S3Service {
@@ -31,12 +34,15 @@ public class S3Service {
         return url.toString();
     }
 
-    public String uploadFile(MultipartFile file) throws IOException {
-        String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-
-        amazonS3.putObject(new PutObjectRequest(bucketName, filename, file.getInputStream(), null)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
-
-        return amazonS3.getUrl(bucketName, filename).toString();
+    public String uploadFile(MultipartFile file) {
+        try {
+            String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(file.getSize());
+            amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), metadata));
+            return amazonS3.getUrl(bucketName, fileName).toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload file to S3", e);
+        }
     }
 }

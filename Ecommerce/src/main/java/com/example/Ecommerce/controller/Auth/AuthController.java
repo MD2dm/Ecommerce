@@ -1,10 +1,10 @@
-package com.example.Ecommerce.controller.CustomerController.Users;
+package com.example.Ecommerce.controller.Auth;
 
 import com.example.Ecommerce.common.enums.Role;
 import com.example.Ecommerce.common.responseStatus.ResponseData;
-import com.example.Ecommerce.dto.UsersDto.JwtAuthResponseDTO;
-import com.example.Ecommerce.dto.UsersDto.LoginRequestDTO;
-import com.example.Ecommerce.dto.UsersDto.RegisterRequestDTO;
+import com.example.Ecommerce.dto.AuthDto.JwtAuthResponseDTO;
+import com.example.Ecommerce.dto.AuthDto.LoginRequestDTO;
+import com.example.Ecommerce.dto.AuthDto.RegisterRequestDTO;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.repository.UserRepository;
 import com.example.Ecommerce.service.Auth.JWT.AuthenticationService;
@@ -23,8 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Customer Auth Controller")
-public class AuthCustomerController {
+@Tag(name = "Auth Controller")
+public class AuthController {
 
     @Autowired
     private final AuthenticationService authenticationService;
@@ -32,15 +32,22 @@ public class AuthCustomerController {
     @Autowired
     private final UserRepository userRepository;
 
-    @Operation(summary = "Register Account User")
+    @Operation(summary = "Register Account Customer")
     @PostMapping("/customers/register")
     public ResponseEntity<ResponseData<Void>> registerCustomer(@RequestBody RegisterRequestDTO request) {
         request.setRole(Role.CUSTOMER);
         return registerUser(request);
     }
 
+    @Operation(summary = "Register Account Seller")
+    @PostMapping("/sellers/register")
+    public ResponseEntity<ResponseData<Void>> registerSeller(@RequestBody RegisterRequestDTO request) {
+        request.setRole(Role.SELLER);
+        return registerUser(request);
+    }
+
     @Operation(summary = "Verify OTP and Complete Registration")
-    @PostMapping("/customers/verify-otp")
+    @PostMapping("/verify-otp")
     public ResponseEntity<ResponseData<User>> verifyOtp(@RequestParam String email, @RequestParam String otp) {
         try {
             User user = authenticationService.verifyOtp(email, otp);
@@ -52,8 +59,20 @@ public class AuthCustomerController {
     }
 
     @Operation(summary = "Login Account User")
-    @PostMapping("/customers/login")
-    public ResponseEntity<ResponseData<JwtAuthResponseDTO>> login(@RequestBody LoginRequestDTO request) {
+    @PostMapping("/login")
+    public ResponseEntity<ResponseData<JwtAuthResponseDTO>> loginUser(@RequestBody LoginRequestDTO request) {
+        try {
+            JwtAuthResponseDTO jwt = authenticationService.login(request);
+            return ResponseEntity.ok(new ResponseData<>(200, "Login successful", jwt));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode())
+                    .body(new ResponseData<>(e.getStatusCode().value(), e.getReason()));
+        }
+    }
+
+    @Operation(summary = "Login Account User")
+    @PostMapping("admin/login")
+    public ResponseEntity<ResponseData<JwtAuthResponseDTO>> loginAdmin(@RequestBody LoginRequestDTO request) {
         try {
             JwtAuthResponseDTO jwt = authenticationService.login(request);
             return ResponseEntity.ok(new ResponseData<>(200, "Login successful", jwt));
@@ -64,12 +83,11 @@ public class AuthCustomerController {
     }
 
     @Operation(summary = "Log Out Account User")
-    @PostMapping("/customers/logout")
+    @PostMapping("/logout")
     public ResponseData<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         SecurityContextHolder.clearContext();
         return new ResponseData<>(204, "Logout successful");
     }
-
 
     private ResponseEntity<ResponseData<Void>> registerUser(RegisterRequestDTO request) {
         // Check username, email, phone, password

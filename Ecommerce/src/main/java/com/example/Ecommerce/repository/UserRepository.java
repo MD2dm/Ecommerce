@@ -2,6 +2,7 @@ package com.example.Ecommerce.repository;
 
 import com.example.Ecommerce.common.enums.Role;
 import com.example.Ecommerce.model.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,4 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByPhone(String phone);
 
     boolean existsByEmail(String email);
+
+    @EntityGraph(attributePaths = "shop")
+    Optional<User> findById(Long id);
 }
