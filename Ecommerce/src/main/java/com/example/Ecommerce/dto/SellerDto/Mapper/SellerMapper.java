@@ -1,6 +1,9 @@
 package com.example.Ecommerce.dto.SellerDto.Mapper;
 
+import com.example.Ecommerce.dto.AdminDto.ResponseInfoAllUsersDTO;
 import com.example.Ecommerce.dto.SellerDto.Response.InfoSeller.InfoSellerDTO;
+import com.example.Ecommerce.dto.SellerDto.Response.Product.ProductWithShopDTO;
+import com.example.Ecommerce.model.Product;
 import com.example.Ecommerce.model.User;
 
 public class SellerMapper {
@@ -21,4 +24,21 @@ public class SellerMapper {
                 .shop(user.getShop())
                 .build();
     }
+
+    public static ProductWithShopDTO infoProduct(Product product, User user){
+        return ProductWithShopDTO.builder()
+                .id(product.getId())
+                .shopName(product.getShop().getShopName())
+                .productName(product.getProductName())
+                .fileUrls(product.getFileUrls())
+                .price(product.getPrice())
+                .colors(product.getColors())
+                .sizes(product.getSizes())
+                .stock(product.getStock())
+                .category(product.getCategory().getCategoryName())
+                .description(product.getDescription())
+                .build();
+
+    }
+
 }

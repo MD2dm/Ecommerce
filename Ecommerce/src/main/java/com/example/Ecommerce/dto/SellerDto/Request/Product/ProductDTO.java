@@ -1,19 +1,17 @@
 package com.example.Ecommerce.dto.SellerDto.Request.Product;
 
-import com.example.Ecommerce.model.Category;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Getter
 @Setter
-public class CreateProductDTO implements Serializable {
+public class ProductDTO implements Serializable {
 
     private String productName;
 

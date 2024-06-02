@@ -1,8 +1,9 @@
 package com.example.Ecommerce.service.Product.Impl;
 
-import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
 import com.example.Ecommerce.common.File.S3Service;
-import com.example.Ecommerce.dto.SellerDto.Request.Product.CreateProductDTO;
+import com.example.Ecommerce.dto.SellerDto.Mapper.SellerMapper;
+import com.example.Ecommerce.dto.SellerDto.Request.Product.ProductDTO;
+import com.example.Ecommerce.dto.SellerDto.Response.Product.ProductWithShopDTO;
 import com.example.Ecommerce.model.Category;
 import com.example.Ecommerce.model.Product;
 import com.example.Ecommerce.model.Shop;
@@ -13,11 +14,11 @@ import com.example.Ecommerce.repository.ProductRepository;
 import com.example.Ecommerce.service.Product.ProductService;
 import com.example.Ecommerce.service.Shop.ShopService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -35,7 +36,17 @@ public class ProductServiceImpl implements ProductService {
     private S3Service s3Service;
 
     @Override
-    public Product saveProduct(User user, CreateProductDTO createProductDTO){
+    public List<ProductWithShopDTO> getAllProduct(User user){
+
+        List<Product> products = productRepository.findAll();
+
+        return products.stream()
+                .map(product -> SellerMapper.infoProduct(product, user))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Product saveProduct(User user, ProductDTO createProductDTO){
         Shop shop = user.getShop();
 
         if (shop == null) {
@@ -66,10 +77,75 @@ public class ProductServiceImpl implements ProductService {
 
         product.setShop(shop);
 
-
-
         return productRepository.save(product);
 
     }
 
+    @Override
+    public ResponseEntity<Product> updateProduct(Long id, User user, ProductDTO productDTO){
+
+        Optional<Product> optionalProduct = productRepository.findById(id);
+
+        if (optionalProduct.isPresent()){
+            Product product = optionalProduct.get();
+
+            if (productDTO.getProductName() != null) {
+                product.setProductName(productDTO.getProductName());
+            }
+
+            if (productDTO.getDescription() != null) {
+                product.setDescription(productDTO.getDescription());
+            }
+
+            if (productDTO.getPrice() != null) {
+                product.setPrice(productDTO.getPrice());
+            }
+
+            if (productDTO.getCategory() != null) {
+                Category category = categoryRepository.findByCategoryName(productDTO.getCategory())
+                        .orElseThrow(() -> new RuntimeException("Category Not Found"));
+                product.setCategory(category);
+            }
+
+            if (productDTO.getStock() != null) {
+                product.setStock(productDTO.getStock());
+            }
+
+            if (productDTO.getFileUrls() != null && !productDTO.getFileUrls().isEmpty()) {
+                List<String> files = s3Service.uploadFiles(productDTO.getFileUrls());
+                product.setFileUrls(files);
+            }
+
+            if (productDTO.getColors() != null) {
+                Set<String> colors = new HashSet<>(productDTO.getColors());
+                product.setColors(colors);
+            }
+
+            if (productDTO.getSizes() != null) {
+                Set<String> sizes = new HashSet<>(productDTO.getSizes());
+                product.setSizes(sizes);
+            }
+
+            Product productUpdate = productRepository.save(product);
+
+            return ResponseEntity.ok(productUpdate);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Override
+    public boolean deleteProduct(Long id){
+        try {
+            Optional<Product> product = productRepository.findById(id);
+            if(product.isPresent()) {
+                productRepository.deleteById(id);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e){
+            return false;
+        }
+    }
 }

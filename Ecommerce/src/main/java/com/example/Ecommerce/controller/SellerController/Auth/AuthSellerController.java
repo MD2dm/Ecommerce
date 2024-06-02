@@ -6,7 +6,6 @@ import com.example.Ecommerce.dto.SellerDto.Mapper.SellerMapper;
 import com.example.Ecommerce.dto.SellerDto.Response.InfoSeller.InfoSellerDTO;
 import com.example.Ecommerce.dto.UserDto.UpdateUserDTO;
 import com.example.Ecommerce.model.User;
-import com.example.Ecommerce.repository.UserRepository;
 import com.example.Ecommerce.service.Auth.JWT.AuthenticationService;
 import com.example.Ecommerce.service.User.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,9 +29,6 @@ public class AuthSellerController {
 
     @Autowired
     private final AuthenticationService authenticationService;
-
-    @Autowired
-    private final UserRepository userRepository;
 
     @Autowired
     private UserService userService;
@@ -58,7 +53,7 @@ public class AuthSellerController {
     }
 
     @Operation(summary = "Update Info Seller")
-    @PutMapping("/update")
+    @PatchMapping("/update")
     public ResponseEntity<?> updateUser(@AuthenticationPrincipal User user,
                                         @RequestPart("sellerInfo") UpdateUserDTO sellerInfo,
                                         @RequestPart("avatar") MultipartFile avatar) {
@@ -76,12 +71,4 @@ public class AuthSellerController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User user = userService.findUserById(id);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(user);
-    }
 }

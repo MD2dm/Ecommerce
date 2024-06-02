@@ -1,5 +1,6 @@
 package com.example.Ecommerce.service.Admin.Impl;
 
+import com.example.Ecommerce.dto.AdminDto.AdminMapper;
 import com.example.Ecommerce.dto.AdminDto.ResponseInfoAllUsersDTO;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.repository.UserRepository;
@@ -23,7 +24,7 @@ public class AdminServiceImpl implements AdminService {
         List<ResponseInfoAllUsersDTO> userDTOs = new ArrayList<>();
 
         for (User user : users) {
-            ResponseInfoAllUsersDTO userDTO = convertToDTO(user);
+            ResponseInfoAllUsersDTO userDTO = AdminMapper.infoAllUsersDTO(user);
             userDTOs.add(userDTO);
         }
 
@@ -34,7 +35,7 @@ public class AdminServiceImpl implements AdminService {
     public ResponseInfoAllUsersDTO getById(Long id) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
-            return convertToDTO(user);
+            return AdminMapper.infoAllUsersDTO(user);
         } else {
             return null;
         }
@@ -63,24 +64,6 @@ public class AdminServiceImpl implements AdminService {
         } catch (Exception e) {
             return false;
         }
-    }
-
-
-    private ResponseInfoAllUsersDTO convertToDTO(User user) {
-        ResponseInfoAllUsersDTO userDTO = new ResponseInfoAllUsersDTO();
-        userDTO.setId(user.getId());
-        userDTO.setUsername(user.getUsername());
-        userDTO.setRole(user.getRole());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setGender(user.getGender());
-        userDTO.setBirthday(user.getBirthday());
-        userDTO.setFirstName(user.getFirstName());
-        userDTO.setLastName(user.getLastName());
-        userDTO.setPhone(user.getPhone());
-        userDTO.setAddress(user.getAddress());
-        userDTO.setCreateAt(user.getCreateAt());
-        userDTO.setUpdateAt(user.getUpdateAt());
-        return userDTO;
     }
 
 }

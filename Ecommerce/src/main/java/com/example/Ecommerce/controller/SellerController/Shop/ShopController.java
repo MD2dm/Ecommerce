@@ -2,6 +2,7 @@ package com.example.Ecommerce.controller.SellerController.Shop;
 
 import com.example.Ecommerce.common.responseStatus.ResponseData;
 import com.example.Ecommerce.common.responseStatus.ResponseError;
+import com.example.Ecommerce.dto.AdminDto.ResponseInfoAllUsersDTO;
 import com.example.Ecommerce.dto.SellerDto.Request.Shop.CreateShopDTO;
 import com.example.Ecommerce.model.Shop;
 import com.example.Ecommerce.model.User;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -53,4 +56,5 @@ public class ShopController {
         }
 
     }
+
 }
