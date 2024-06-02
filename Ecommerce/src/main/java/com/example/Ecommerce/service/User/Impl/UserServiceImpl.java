@@ -1,7 +1,8 @@
 package com.example.Ecommerce.service.User.Impl;
 
 import com.example.Ecommerce.common.File.S3Service;
-import com.example.Ecommerce.dto.CustomerDto.Request.UpdateCustomerDTO;
+import com.example.Ecommerce.dto.UserDto.UpdateUserDTO;
+import com.example.Ecommerce.model.Shop;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.repository.UserRepository;
 import com.example.Ecommerce.service.User.UserService;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
     private final S3Service s3Service;
 
     @Override
-    public ResponseEntity<User> updateUser(Long userId, UpdateCustomerDTO request ) throws IOException {
+    public ResponseEntity<User> updateUser(Long userId, UpdateUserDTO request ) throws IOException {
         {
             Optional<User> optionalUser = userRepository.findById(userId);
 
@@ -42,10 +42,8 @@ public class UserServiceImpl implements UserService {
                 }
 
                 //check avatar
-                String avatarUrl = s3Service.uploadFile(request.getAvatar());
+                String avatarUrl = s3Service.uploadSingleFile(request.getAvatar());
                 user.setAvatar(avatarUrl);
-
-
 
                 user.setBirthday(request.getBirthday());
                 user.setFirstName(request.getFirstName());
@@ -69,7 +67,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public User findUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
+    @Override
+    public Shop getShopByUserId(Long userId) {
+        User user = findUserById(userId);
+        return user.getShop();
     }
+
+    public User findUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
 }

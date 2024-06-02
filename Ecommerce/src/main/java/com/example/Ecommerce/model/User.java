@@ -77,6 +77,7 @@ public class User extends AbstractEntity implements UserDetails, Serializable {
 
     private boolean isVerified;
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
@@ -86,6 +87,7 @@ public class User extends AbstractEntity implements UserDetails, Serializable {
     public String getUsername(){
         return username;
     }
+
 
     @Override
     public boolean isAccountNonExpired() {

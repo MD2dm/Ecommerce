@@ -73,7 +73,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         long expiryTime = System.currentTimeMillis() + (5 * 60 * 1000);
         temporaryStorage.storeRegistration(request.getEmail(), request);
         temporaryStorage.storeOtp(request.getEmail(), otp, expiryTime);
-        emailService.sendOtp(request.getEmail(), otp);
+        emailService.sendOtpRegister(request.getEmail(), otp);
     }
 
     @Override
@@ -160,7 +160,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         long expiryTime = System.currentTimeMillis() + (5 * 60 * 1000); // 5 minutes expiry
         temporaryStorage.storeOtp(email, otp, expiryTime);
 
-        emailService.sendPasswordResetEmail(email, otp);
+        emailService.sendOtpForgotPassword(email, otp);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.example.Ecommerce.service.Category.CategoryImpl;
 
+import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
 import com.example.Ecommerce.dto.CategoryDto.RequestCategoryDTO;
 import com.example.Ecommerce.model.Category;
-import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.repository.CategoryRepository;
 import com.example.Ecommerce.service.Category.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +35,12 @@ public class CategoryServiceImpl implements CategoryService {
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No category found");
         }
+    }
+
+    @Override
+    public Category findByName(String nameCategory){
+        return categoryRepository.findByCategoryName(nameCategory)
+                .orElseThrow(() -> new RuntimeException("Shop not found"));
     }
 
     @Override

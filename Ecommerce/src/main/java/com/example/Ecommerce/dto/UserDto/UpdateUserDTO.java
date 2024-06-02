@@ -1,4 +1,4 @@
-package com.example.Ecommerce.dto.CustomerDto.Request;
+package com.example.Ecommerce.dto.UserDto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,9 +7,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.Serializable;
 import java.util.Date;
 
-@Getter
-@Setter
-public class UpdateCustomerDTO implements Serializable {
+@Getter@Setter
+public class UpdateUserDTO implements Serializable {
+
+    private Long id;
 
     private String email;
 

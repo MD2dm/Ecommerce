@@ -1,7 +1,6 @@
 package com.example.Ecommerce.controller.AdminController;
 
 import com.example.Ecommerce.common.responseStatus.ResponseData;
-import com.example.Ecommerce.common.responseStatus.ResponseError;
 import com.example.Ecommerce.dto.CategoryDto.RequestCategoryDTO;
 import com.example.Ecommerce.model.Category;
 import com.example.Ecommerce.service.Category.CategoryService;

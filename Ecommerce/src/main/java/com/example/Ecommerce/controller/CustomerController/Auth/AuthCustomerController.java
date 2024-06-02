@@ -3,8 +3,8 @@ package com.example.Ecommerce.controller.CustomerController.Auth;
 import com.example.Ecommerce.common.responseStatus.ResponseData;
 import com.example.Ecommerce.common.responseStatus.ResponseError;
 import com.example.Ecommerce.dto.CustomerDto.Mapper.CustomerMapper;
-import com.example.Ecommerce.dto.CustomerDto.Request.UpdateCustomerDTO;
 import com.example.Ecommerce.dto.CustomerDto.Response.InfoCustomerDTO;
+import com.example.Ecommerce.dto.UserDto.UpdateUserDTO;
 import com.example.Ecommerce.model.User;
 import com.example.Ecommerce.service.Auth.JWT.AuthenticationService;
 import com.example.Ecommerce.service.User.UserService;
@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,21 +34,19 @@ public class AuthCustomerController {
     @Autowired
     private UserService userService;
 
-    @Operation(summary = "Update Info User")
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id,
-                                             @RequestPart("userInfo") UpdateCustomerDTO userInfo,
-                                             @RequestPart("avatar") MultipartFile avatar) {
+    @Operation(summary = "Update Info Customer")
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(@AuthenticationPrincipal User user,
+                                        @RequestPart("customerInfo") UpdateUserDTO customerInfo,
+                                        @RequestPart("avatar") MultipartFile avatar) {
         try {
-            userInfo.setAvatar(avatar);
-            userService.updateUser(id, userInfo);
-            return ResponseEntity.ok("User updated successfully");
+            customerInfo.setAvatar(avatar);
+            User updatedCustomer = userService.updateUser(user.getId(), customerInfo).getBody();
+
+            return ResponseEntity.ok(new ResponseData<>(200, "Customer updated successfully", updatedCustomer));
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseError(400,"Failed to process the avatar file."));
-        } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseError(404,"Failed to process the avatar file."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ResponseError(500,"An unexpected error occurred"));

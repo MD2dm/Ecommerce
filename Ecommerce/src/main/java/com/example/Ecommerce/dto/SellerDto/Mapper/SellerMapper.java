@@ -4,6 +4,7 @@ import com.example.Ecommerce.dto.SellerDto.Response.InfoSeller.InfoSellerDTO;
 import com.example.Ecommerce.model.User;
 
 public class SellerMapper {
+
     public static InfoSellerDTO infoSellerDTO(User user){
         return InfoSellerDTO.builder()
                 .id(user.getId())

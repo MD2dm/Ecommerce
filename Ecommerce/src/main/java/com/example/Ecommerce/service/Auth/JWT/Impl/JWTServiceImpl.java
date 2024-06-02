@@ -8,6 +8,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import com.example.Ecommerce.model.User;
 
 import java.security.Key;
 import java.util.Date;
@@ -19,9 +20,13 @@ public class JWTServiceImpl implements JWTService {
 
     @Override
     public String generateToken(UserDetails userDetails){
+
+        Long userId = getUserIdFromUserDetails(userDetails);
+
         return Jwts
                 .builder()
                 .setSubject(userDetails.getUsername())
+                .claim("id", userId)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 *24))
                 .signWith(getSiginKey(), SignatureAlgorithm.HS256)
@@ -30,10 +35,14 @@ public class JWTServiceImpl implements JWTService {
 
     @Override
     public String generateRefreshTokenToken(Map<String, Object> extraClaims, UserDetails userDetails){
+
+        Long userId = getUserIdFromUserDetails(userDetails);
+
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
+                .claim("id", userId)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 604800000))
                 .signWith(getSiginKey(), SignatureAlgorithm.HS256)
@@ -73,5 +82,13 @@ public class JWTServiceImpl implements JWTService {
     private boolean isTokenExpired(String token){
         return extractClaim(token, Claims::getExpiration)
                 .before(new Date());
+    }
+
+    private Long getUserIdFromUserDetails(UserDetails userDetails) {
+        if (userDetails instanceof User) {
+            return ((User) userDetails).getId();
+        } else {
+            return null;
+        }
     }
 }

@@ -8,4 +8,6 @@ public interface ShopService {
 
     Shop saveShop(Long id, CreateShopDTO request) throws Exception;
 
+    Shop getShopByUserId(Long userId);
+
 }

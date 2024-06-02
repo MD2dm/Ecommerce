@@ -18,4 +18,6 @@ public interface CategoryService {
 
     boolean deleteCategory(Long id);
 
+    Category findByName(String nameCategory);
+
 }

@@ -1,9 +1,12 @@
 package com.example.Ecommerce.model;
 
 import com.example.Ecommerce.common.abstractClasses.AbstractEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -15,6 +18,11 @@ import java.util.Set;
 @Table(name = "product")
 public class Product extends AbstractEntity {
 
+    @ElementCollection
+    @CollectionTable(name = "product_files", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "file_url")
+    private List<String> fileUrls;
+
     @Column(name = "product_name", length = 255)
     private String productName;
 
@@ -24,21 +32,22 @@ public class Product extends AbstractEntity {
     @Column(name = "price",nullable = false)
     private Double price;
 
-    @Column(name = "color",nullable = false)
-    private String color;
+    @ElementCollection
+    @CollectionTable(name = "product_colors", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "colors")
+    private Set<String> colors = new HashSet<>();;
 
-    @Column(name = "size",nullable = false)
-    private String size;
+    @ElementCollection
+    @CollectionTable(name = "product_sizes", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "sizes")
+    private Set<String> sizes = new HashSet<>();
 
     @Column(name = "stock",nullable = false)
     private Integer stock;
 
     @ManyToOne
-    @JoinColumn(name = "seller_id", nullable = false)
-    private User seller;
-
-    @ManyToOne
     @JoinColumn(name = "shop_id", nullable = false)
+    @JsonBackReference
     private Shop shop;
 
     @ManyToOne
